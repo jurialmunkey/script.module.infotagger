@@ -129,7 +129,7 @@ class ListItemInfoTag():
         self._info_tag.setUniqueIDs({k: f'{v}' for k, v in unique_ids.items()}, default_id)
 
     def set_stream_details(self, stream_details: dict):
-        """ Wrapper for compatibility with Matrix ListItem.addStreamInfo() method """
+        """ Wrapper for compatibility with multiple ListItem.addStreamInfo() methods in one call """
         if not stream_details:
             return
 
@@ -156,3 +156,9 @@ class ListItemInfoTag():
                 self._info_tag.addSubtitleStream(SubtitleStreamDetail(**i))
         except (KeyError, TypeError):
             pass
+
+    def add_stream_info(self, stream_type, stream_values):
+        """ Wrapper for compatibility with Matrix ListItem.addStreamInfo() method """
+        stream_details = {'video': [], 'audio': [], 'subtitle': []}
+        stream_details[stream_type] = [stream_values]
+        self.set_stream_details(stream_details)
