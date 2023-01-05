@@ -105,11 +105,18 @@ class ListItemInfoTag():
         }
     }
 
-    def __init__(self, listitem, tag_type: str = 'video', type_check=True):
+    def __init__(self, listitem, tag_type: str = 'video', type_check=False):
         """
         Pass xbmcgui.ListItem() to listitem with tag_type to the library type normally in li.setInfo(type=)
-        Optional set type_check=True to use internal isinstance check rather than rely on Kodi Python API raising TypeError
-        The type_check can help reduce log spam from TypeError exceptions when internal info doesn't match expected
+        Optional set type_check=
+            - False: (default)
+                - Slightly increases performance by avoiding additional internal type checks
+                - Relys on Kodi Python API raising a TypeError to determine when to force type conversion
+                - Kodi creates EXCEPTION log spam when infolabels require type conversion
+            - True:
+                - Slightly descreases performance by requiring additional internal type checks
+                - Uses internal isinstance type check to determine when to force type conversion
+                - Prevents Kodi EXCEPTION log spam when infolabels require type conversion
         """
         self._listitem = listitem
         self._tag_type = tag_type
