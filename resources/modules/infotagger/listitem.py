@@ -6,11 +6,28 @@ from xbmc import Actor, VideoStreamDetail, AudioStreamDetail, SubtitleStreamDeta
 from xbmc import log as kodi_log
 
 
+def set_info_tag(
+        listitem, infolabels: dict,
+        tag_type: str = 'video', type_check: bool = False,
+        old_method_keys: tuple = ('size', 'count', 'date', )):
+
+    if old_method_keys:
+        il = {k: infolabels[k] for k in old_method_keys if k in infolabels}
+        listitem.setInfo(tag_type, il)
+
+    info_tag = ListItemInfoTag(listitem, tag_type, type_check)
+    info_tag.set_info(infolabels)
+    return info_tag
+
+
 class ListItemInfoTag():
     INFO_TAG_ATTR = {
         'video': {
             'tag_getter': 'getVideoInfoTag',
             'tag_attr': {
+                'size': {'skip': True},  # Currently no infoTag setter for this property
+                'count': {'skip': True},  # Currently no infoTag setter for this property
+                'date': {'attr': 'setDateAdded', 'convert': str, 'classinfo': str},  # Unsure if this is the correct place to route this generic value
                 'genre': {'attr': 'setGenres', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
                 'country': {'attr': 'setCountries', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
                 'year': {'attr': 'setYear', 'convert': int, 'classinfo': int},
@@ -58,7 +75,6 @@ class ListItemInfoTag():
                 'path': {'attr': 'setPath', 'convert': str, 'classinfo': str},
                 'trailer': {'attr': 'setTrailer', 'convert': str, 'classinfo': str},
                 'dateadded': {'attr': 'setDateAdded', 'convert': str, 'classinfo': str},
-                'date': {'attr': 'setDateAdded', 'convert': str, 'classinfo': str},
                 'mediatype': {'attr': 'setMediaType', 'convert': str, 'classinfo': str},
                 'dbid': {'attr': 'setDbId', 'convert': int, 'classinfo': int},
             }
@@ -66,6 +82,9 @@ class ListItemInfoTag():
         'music': {
             'tag_getter': 'getMusicInfoTag',
             'tag_attr': {
+                'size': {'skip': True},  # Currently no infoTag setter for this property
+                'count': {'skip': True},  # Currently no infoTag setter for this property
+                'date': {'skip': True},  # Currently no infoTag setter for this property
                 'tracknumber': {'attr': 'setTrack', 'convert': int, 'classinfo': int},
                 'discnumber': {'attr': 'setDisc', 'convert': int, 'classinfo': int},
                 'duration': {'attr': 'setDuration', 'convert': int, 'classinfo': int},
@@ -93,6 +112,9 @@ class ListItemInfoTag():
         'game': {
             'tag_getter': 'getGameInfoTag',
             'tag_attr': {
+                'size': {'skip': True},  # Currently no infoTag setter for this property
+                'count': {'skip': True},  # Currently no infoTag setter for this property
+                'date': {'skip': True},  # Currently no infoTag setter for this property
                 'title': {'attr': 'setTitle', 'convert': str, 'classinfo': str},
                 'platform': {'attr': 'setPlatform', 'convert': str, 'classinfo': str},
                 'genres': {'attr': 'setGenres', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
@@ -129,19 +151,22 @@ class ListItemInfoTag():
         for k, v in infolabels.items():
             if v is None:
                 continue
+
             try:
                 _tag_attr = self._tag_attr[k]
+
+            except KeyError:
+                log_msg = f'[script.module.infotagger] set_info:\nKeyError: {k}'
+                kodi_log(log_msg, level=LOGINFO)
+                continue
+
+            try:
                 func = getattr(self._info_tag, _tag_attr['attr'])
                 if self._type_chk and not isinstance(v, _tag_attr['classinfo']):
                     raise TypeError
                 func(v)
 
             except KeyError:
-                if k not in self._tag_attr:
-                    log_msg = f'[script.module.infotagger] set_info:\nKeyError: {k}'
-                    kodi_log(log_msg, level=LOGINFO)
-                    continue
-
                 if _tag_attr.get('skip'):
                     continue
 
