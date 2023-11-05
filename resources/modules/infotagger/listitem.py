@@ -200,8 +200,14 @@ class _ListItemInfoTagVideo(_ListItemInfoTag):
     def set_resume_point(self, infoproperties: dict, resume_key='ResumeTime', total_key='TotalTime', pop_keys=True):
         """ Wrapper to get/pop resumetime and totaltime properties for InfoTagVideo.setResumePoint() """
         getter_func = infoproperties.pop if pop_keys else infoproperties.get
-        resume_time = int(getter_func(resume_key, 0))
-        total_time = int(getter_func(total_key, 0))
+        try:
+            resume_time = float(getter_func(resume_key, 0.0))
+        except ValueError:
+            resume_time = None
+        try:
+            total_time = float(getter_func(total_key, 0.0))
+        except ValueError:
+            total_time = None
         if resume_time and total_time:
             self._info_tag.setResumePoint(resume_time, total_time)
         elif resume_time:
