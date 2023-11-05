@@ -68,6 +68,13 @@ class _ListItemInfoTag():
                     raise TypeError
                 func(v)
 
+            except AttributeError:
+                """ InfoTag setter doesnt exist for that key so skip.
+                Occurs when user is on Kodi version before that particular setter was added.
+                Error caught without raising to maintain backwards compatibility without versioning.
+                """
+                continue
+
             except KeyError:
                 if _tag_attr.get('skip'):
                     continue
@@ -232,6 +239,7 @@ class _ListItemInfoTagMusic(_ListItemInfoTag):
         'musicbrainzartistid': {'attr': 'setMusicBrainzArtistID', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
         'musicbrainzalbumid': {'attr': 'setMusicBrainzAlbumID', 'convert': str, 'classinfo': str},
         'musicbrainzalbumartistid': {'attr': 'setMusicBrainzAlbumArtistID', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
+        'songvideourl': {'attr': 'setSongVideoURL', 'convert': str, 'classinfo': str},
         'comment': {'attr': 'setComment', 'convert': str, 'classinfo': str},
         'albumartist': {'attr': 'setAlbumArtist', 'convert': str, 'classinfo': str},  # Not listed in setInfo docs but included for forward compatibility
     }
