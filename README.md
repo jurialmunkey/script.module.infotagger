@@ -49,7 +49,7 @@ info_tag.set_stream_details(stream_details)
 ```
 
 
-Currently there are no setters for the size, count, and date infolabels. The optional `set_info_tag` method will first set these infolabels using setInfo before passing through the remainer of the dictionary to the `set_info` method of ListItemInfoTag. The method then returns the ListItemInfoTag object for further use.
+Currently there are no setters for the size, count, and date infolabels. The optional `set_info_tag` method will first set these infolabels using `setInfo()` method of the listitem before passing through the remainer of the dictionary to the `set_info` method of ListItemInfoTag. The method then returns the ListItemInfoTag object for further use.
 
 ```python
 from infotagger.listitem import set_info_tag
