@@ -76,7 +76,7 @@ class _ListItemInfoTag():
                 continue
 
             except KeyError:
-                if _tag_attr.get('skip'):
+                if 'skip' in _tag_attr:
                     continue
 
                 if 'route' in _tag_attr:
@@ -91,13 +91,17 @@ class _ListItemInfoTag():
             except TypeError:
                 func(_tag_attr['convert'](v))  # Attempt to force conversion to correct type
 
+    def set_datetime(self, label: str, *args, **kwargs):
+        """ Wrapper for ListItem.setInfo() to ListItem.setDateTime() """
+        self._listitem.setDateTime(label)
+
 
 class _ListItemInfoTagVideo(_ListItemInfoTag):
     _tag_gttr = 'getVideoInfoTag'
     _tag_attr = {
         'size': {'skip': True},  # Currently no infoTag setter for this property
         'count': {'skip': True},  # Currently no infoTag setter for this property
-        'date': {'attr': 'setDateAdded', 'convert': str, 'classinfo': str},  # Unsure if this is the correct place to route this generic value
+        'date': {'route': 'set_datetime'},
         'genre': {'attr': 'setGenres', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
         'country': {'attr': 'setCountries', 'convert': lambda x: [x], 'classinfo': (list, tuple)},
         'year': {'attr': 'setYear', 'convert': int, 'classinfo': int},
