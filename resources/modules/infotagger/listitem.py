@@ -254,7 +254,9 @@ class _ListItemInfoTagVideo(_ListItemInfoTag):
 
     def set_unique_ids(self, unique_ids: dict, default_id: str = None):
         """ Wrapper for compatibility with Matrix ListItem.setUniqueIDs() method """
-        self._info_tag.setUniqueIDs({k: f'{v}' for k, v in unique_ids.items()}, default_id)
+        func = self._info_tag.setUniqueIDs
+        data = {k: f'{v}' for k, v in unique_ids.items()}
+        func(data, default_id) if default_id else func(data)
 
 
 class _ListItemInfoTagMusic(_ListItemInfoTag):
